@@ -112,8 +112,10 @@ func (c *EndpointsConfig) Run(stopCh <-chan struct{}) {
 	// to the registered handler.
 	go func() {
 		for {
+                        glog.V(4).Infof("debugjesse config for loop")
 			select {
 			case <-c.updates:
+                                glog.V(4).Infof("debugjesse config update received1")
 				endpoints, err := c.lister.List(labels.Everything())
 				if err != nil {
 					glog.Errorf("Error while listing endpoints from cache: %v", err)
@@ -121,20 +123,26 @@ func (c *EndpointsConfig) Run(stopCh <-chan struct{}) {
 					c.dispatchUpdate()
 					continue
 				}
+                                glog.V(4).Infof("debugjesse config update received2")
 				if endpoints == nil {
 					endpoints = []*api.Endpoints{}
 				}
+                                glog.V(4).Infof("debugjesse config update received3 len handlers %d len endpoints %d", len(c.handlers), len(endpoints))
 				for i := range c.handlers {
 					glog.V(3).Infof("Calling handler.OnEndpointsUpdate()")
+	                                glog.V(4).Infof("debugjesse blocking call?")
 					c.handlers[i].OnEndpointsUpdate(endpoints)
+                                        glog.V(4).Infof("debugjesse its not")
 				}
 			case <-c.stop:
+				glog.V(4).Infof("debugjesse config run stop")
 				return
 			}
 		}
 	}()
 	// Close updates channel when stopCh is closed.
 	go func() {
+                glog.V(4).Infof("debugjesse config run stop2")
 		<-stopCh
 		close(c.stop)
 	}()
@@ -153,12 +161,16 @@ func (c *EndpointsConfig) handleDeleteEndpoints(_ interface{}) {
 }
 
 func (c *EndpointsConfig) dispatchUpdate() {
+        glog.V(4).Infof("debugjesse dispatchupdate")
 	select {
 	case c.updates <- struct{}{}:
+        	glog.V(4).Infof("debugjesse update enqueue")
 		// Work enqueued successfully
 	case <-c.stop:
+                glog.V(4).Infof("debugjesse we are stopped")
 		// We're shut down / avoid logging the message below
 	default:
+                glog.V(4).Infof("debugjesse there is already stuff in updates queue")
 		glog.V(4).Infof("Endpoints handler already has a pending interrupt.")
 	}
 }
@@ -271,7 +283,9 @@ func (c *ServiceConfig) dispatchUpdate() {
 // when changes occur.
 func watchForUpdates(bcaster *config.Broadcaster, accessor config.Accessor, updates <-chan struct{}) {
 	for true {
+                glog.V(4).Infof("debugjesse update")
 		<-updates
 		bcaster.Notify(accessor.MergedState())
 	}
+        glog.V(4).Infof("debugjesse should not happen")
 }

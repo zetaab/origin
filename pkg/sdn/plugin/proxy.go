@@ -232,19 +232,23 @@ func (proxy *OsdnProxy) firewallBlocksIP(namespace string, ip net.IP) bool {
 }
 
 func (proxy *OsdnProxy) OnEndpointsUpdate(allEndpoints []*kapi.Endpoints) {
+	glog.V(4).Infof("debugjesse proxy OnEndpointsUpdate 1")
 	proxy.lock.Lock()
+	glog.V(4).Infof("debugjesse proxy OnEndpointsUpdate 2")
 	defer proxy.lock.Unlock()
+	glog.V(4).Infof("debugjesse proxy OnEndpointsUpdate 3")
 	proxy.allEndpoints = allEndpoints
 	proxy.updateEndpoints()
 }
 
 func (proxy *OsdnProxy) updateEndpoints() {
+	glog.V(4).Infof("debugjesse proxy updateEndpoints 1")
 	if len(proxy.firewall) == 0 {
 		proxy.baseEndpointsHandler.OnEndpointsUpdate(proxy.allEndpoints)
 		return
 	}
-
 	filteredEndpoints := make([]*kapi.Endpoints, 0, len(proxy.allEndpoints))
+	glog.V(4).Infof("debugjesse proxy updateEndpoints 2")
 
 EndpointLoop:
 	for _, ep := range proxy.allEndpoints {
@@ -263,7 +267,9 @@ EndpointLoop:
 		filteredEndpoints = append(filteredEndpoints, ep)
 	}
 
+	glog.V(4).Infof("debugjesse proxy updateEndpoints 3")
 	proxy.baseEndpointsHandler.OnEndpointsUpdate(filteredEndpoints)
+        glog.V(4).Infof("debugjesse proxy updateEndpoints 4")
 }
 
 func (proxy *OsdnProxy) syncEgressDNSProxyFirewall() {

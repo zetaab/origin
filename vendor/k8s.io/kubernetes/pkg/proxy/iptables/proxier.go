@@ -566,28 +566,40 @@ func (proxier *Proxier) OnServiceUpdate(allServices []*api.Service) {
 
 // OnEndpointsUpdate takes in a slice of updated endpoints.
 func (proxier *Proxier) OnEndpointsUpdate(allEndpoints []*api.Endpoints) {
+        glog.V(4).Infof("debugjesse OnEndpointsUpdate 1")
 	proxier.mu.Lock()
+        glog.V(4).Infof("debugjesse OnEndpointsUpdate 2")
 	defer proxier.mu.Unlock()
+        glog.V(4).Infof("debugjesse OnEndpointsUpdate 3")
 	if proxier.allEndpoints == nil {
 		glog.V(2).Info("Received first Endpoints update")
 	}
 	proxier.allEndpoints = allEndpoints
 
+	glog.V(4).Infof("debugjesse OnEndpointsUpdate 4")
+
 	// TODO: once service has made this same transform, move this into proxier.syncProxyRules()
 	newMap, staleConnections := updateEndpoints(proxier.allEndpoints, proxier.endpointsMap, proxier.hostname, proxier.healthChecker)
+        glog.V(4).Infof("debugjesse OnEndpointsUpdate 5")
 	if len(newMap) != len(proxier.endpointsMap) || !reflect.DeepEqual(newMap, proxier.endpointsMap) {
+	        glog.V(4).Infof("debugjesse OnEndpointsUpdate 6")
 		proxier.endpointsMap = newMap
+	        glog.V(4).Infof("debugjesse OnEndpointsUpdate 7")
 		proxier.syncProxyRules()
+	        glog.V(4).Infof("debugjesse OnEndpointsUpdate 8")
 	} else {
 		glog.V(4).Infof("Skipping proxy iptables rule sync on endpoint update because nothing changed")
 	}
 
 	proxier.deleteEndpointConnections(staleConnections)
+        glog.V(4).Infof("debugjesse OnEndpointsUpdate 9")
 }
 
 // Convert a slice of api.Endpoints objects into a map of service-port -> endpoints.
 func updateEndpoints(allEndpoints []*api.Endpoints, curMap proxyEndpointMap, hostname string,
 	healthChecker healthChecker) (newMap proxyEndpointMap, staleSet map[endpointServicePair]bool) {
+
+	glog.V(4).Infof("debugjesse updateEndpoints 1")
 
 	// return values
 	newMap = make(proxyEndpointMap)
