@@ -74,6 +74,7 @@ func (proxy *OsdnProxy) Start(baseHandler pconfig.EndpointsConfigHandler) error 
 		return fmt.Errorf("could not get EgressNetworkPolicies: %s", err)
 	}
 
+        glog.V(4).Infof("debugjesse proxy Start lock")
 	proxy.lock.Lock()
 	defer proxy.lock.Unlock()
 
@@ -100,6 +101,7 @@ func (proxy *OsdnProxy) watchEgressNetworkPolicies() {
 		}
 
 		func() {
+                        glog.V(4).Infof("debugjesse proxy watchEgressNetworkPolicies lock")
 			proxy.lock.Lock()
 			defer proxy.lock.Unlock()
 			proxy.updateEgressNetworkPolicy(*policy)
@@ -232,7 +234,7 @@ func (proxy *OsdnProxy) firewallBlocksIP(namespace string, ip net.IP) bool {
 }
 
 func (proxy *OsdnProxy) OnEndpointsUpdate(allEndpoints []*kapi.Endpoints) {
-	glog.V(4).Infof("debugjesse proxy OnEndpointsUpdate 1")
+	glog.V(4).Infof("debugjesse proxy OnEndpointsUpdate 1 lock")
 	proxy.lock.Lock()
 	glog.V(4).Infof("debugjesse proxy OnEndpointsUpdate 2")
 	defer proxy.lock.Unlock()
@@ -299,7 +301,7 @@ func (proxy *OsdnProxy) syncEgressDNSProxyFirewall() {
 				continue
 			}
 		}
-
+                glog.V(4).Infof("debugjesse proxy lock syncEgressDNSProxyFirewall")
 		proxy.lock.Lock()
 		defer proxy.lock.Unlock()
 
