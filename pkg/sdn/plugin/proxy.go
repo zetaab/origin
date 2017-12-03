@@ -86,6 +86,7 @@ func (proxy *OsdnProxy) Start(baseHandler pconfig.EndpointsConfigHandler) error 
 	go utilwait.Forever(proxy.syncEgressDNSProxyFirewall, 0)
 	go utilwait.Forever(proxy.watchEgressNetworkPolicies, 0)
 	go utilwait.Forever(proxy.watchNetNamespaces, 0)
+        glog.V(4).Infof("debugjesse proxy Start lock free")
 	return nil
 }
 
@@ -108,6 +109,7 @@ func (proxy *OsdnProxy) watchEgressNetworkPolicies() {
 			if proxy.allEndpoints != nil {
 				proxy.updateEndpoints()
 			}
+                        glog.V(4).Infof("debugjesse proxy watchEgressNetworkPolicies lock free")
 		}()
 		return nil
 	})
@@ -241,6 +243,7 @@ func (proxy *OsdnProxy) OnEndpointsUpdate(allEndpoints []*kapi.Endpoints) {
 	glog.V(4).Infof("debugjesse proxy OnEndpointsUpdate 3")
 	proxy.allEndpoints = allEndpoints
 	proxy.updateEndpoints()
+        glog.V(4).Infof("debugjesse proxy OnEndpointsUpdate lock free")
 }
 
 func (proxy *OsdnProxy) updateEndpoints() {
@@ -309,6 +312,7 @@ func (proxy *OsdnProxy) syncEgressDNSProxyFirewall() {
 		if proxy.allEndpoints != nil {
 			proxy.updateEndpoints()
 		}
+                glog.V(4).Infof("debugjesse proxy lock syncEgressDNSProxyFirewall free")
 	}
 }
 
